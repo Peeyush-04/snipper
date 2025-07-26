@@ -87,7 +87,8 @@ If it does not work immediately, restart your terminal or VS Code.
 ## Usage
 
 ```bash
-snipper init                 # Initialize the database/config (optional) - creates backup is [name] is promted (do not use [name] currently, use init only)
+snipper init                 # Initialize the database/config (optional) - creates backup if [name] is promted
+# (do not use [name] currently, use init only)
 snipper add                  # Add a new snippet
 snipper list                 # List all snippets
 snipper show <id>            # Show a snippet by ID
