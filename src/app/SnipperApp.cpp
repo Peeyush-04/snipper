@@ -146,12 +146,25 @@ void SnipperApp::listSnippets() {
 
 void SnipperApp::addSnippet() {
   model::Snippet s;
+
   std::cout << "Enter ID: ";
   std::getline(std::cin, s.id);
+
   std::cout << "Enter Title: ";
   std::getline(std::cin, s.title);
-  std::cout << "Enter Content: ";
-  std::getline(std::cin, s.content);
+
+  std::cout << "Enter Content (paste multiple lines and press Ctrl+D (Linux/macOS) or Ctrl+Z then Enter (Windows) to finish):\n";
+
+  std::ostringstream contentStream;
+  std::string line;
+  while (std::getline(std::cin, line)) {
+    contentStream << line << '\n';
+  }
+  s.content = contentStream.str();
+
+  // Clear the EOF state so we can continue taking input
+  std::cin.clear();
+
   std::cout << "Enter Tags (comma-separated): ";
   std::string tags;
   std::getline(std::cin, tags);
