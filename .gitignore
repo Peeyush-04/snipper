@@ -1,0 +1,17 @@
+# Build files
+/build/
+*.o
+*.out
+*.exe
+
+# Backup files
+*.bak
+*.tmp
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+
+# App Data
+data/snippets.db
