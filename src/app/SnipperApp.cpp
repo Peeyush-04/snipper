@@ -13,6 +13,10 @@
 #include <iomanip>
 #include <sstream>
 
+#ifndef DEFAULT_PROJECT_ROOT
+#error "DEFAULT_PROJECT_ROOT not defined"
+#endif
+
 namespace app {
 
 SnipperApp::SnipperApp(int argc, char** argv)
@@ -421,18 +425,24 @@ void SnipperApp::importSnippets(const std::string& filePath, bool overwrite) {
 }
 
 void SnipperApp::initStore(const std::optional<std::string>& nameOpt) {
-  // Determine path: either default or a new file named <name>.json
-  std::string dbPath = _config.snippetsDbPath();
+  std::string dbPath;
+
   if (nameOpt) {
-    dbPath = nameOpt.value() + ".json";
-    _store = core::SnippetStore(dbPath);
+    // Ensure the new store is inside the data directory
+    dbPath = std::string(DEFAULT_PROJECT_ROOT) + "/data/" + nameOpt.value() + ".db";
+  } else {
+    dbPath = _config.snippetsDbPath();  // Defaults to DEFAULT_SNIPPETS_DB
   }
-  // Create an empty JSON array in the target file
+
+  _store = core::SnippetStore(dbPath);
+
+  // Create an empty JSON array in the file
   std::ofstream out(dbPath);
   if (!out) {
     std::cout << "Failed to create store at: " << dbPath << "\n";
     return;
   }
+
   out << "[]\n";
   std::cout << "Initialized snippet store at: " << dbPath << "\n";
 }
