@@ -36,10 +36,10 @@ cd snipper
 #### Windows (PowerShell)
 
 ```powershell
-mkdir build
+mkdir -p build
 cd build
-cmake .. -G "Visual Studio 17 2022" -A x64
-cmake --build . --config Release
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+ninja
 ```
 
 #### Linux / macOS
