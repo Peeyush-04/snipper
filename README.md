@@ -14,6 +14,31 @@ It helps developers save, search, tag, edit, and manage reusable code snippets u
 - Cross-platform support (Windows, Linux, macOS)
 - Built-in test suite using GoogleTest
 
+### Adding Snippets (with multiline paste support)
+
+Use the interactive `snipper add` command to add a new snippet.
+
+```bash
+snipper add
+```
+
+- You'll be prompted to enter ID, Title, Content, and Tags.
+- For content, you can paste multiline code (like from VS Code, Sublime, etc.).
+- After pasting, press:
+- Ctrl+D on Linux/macOS
+- Ctrl+Z then Enter on Windows
+to finish content input.
+
+Example:
+
+```
+Enter Content (paste multiple lines and press Ctrl+D (Linux/macOS) or Ctrl+Z then Enter (Windows) to finish):
+for (int i = 0; i < 10; ++i) {
+    std::cout << i << std::endl;
+}
+[Ctrl+D]
+```
+
 ## Getting Started
 
 ### Prerequisites
