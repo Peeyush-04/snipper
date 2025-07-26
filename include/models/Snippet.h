@@ -15,6 +15,9 @@ struct Snippet {
   std::string createdAt;  // ISO 8601 format
   std::string updatedAt;
 
+  // Default constructor needed for deserialization & testing
+  Snippet() = default;
+
   // Optional convenience methods
   static Snippet fromJson(const nlohmann::json& j);
   nlohmann::json toJson() const;
