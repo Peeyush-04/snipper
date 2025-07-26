@@ -1,0 +1,16 @@
+{
+  "snippetsDbPath": "data/snippets.db",
+
+  "hotkeys": {
+    "openPalette": "Ctrl+Shift+S",
+    "copySnippet": "Ctrl+Shift+C",
+    "addSnippet": "Ctrl+Shift+N",
+    "deleteSnippet": "Ctrl+Shift+D"
+  },
+
+  "ui": {
+    "theme": "light",
+    "fontFamily": "Consolas",
+    "fontSize": 12
+  }
+}
