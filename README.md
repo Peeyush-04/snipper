@@ -36,7 +36,7 @@ Enter Content (paste multiple lines and press Ctrl+D (Linux/macOS) or Ctrl+Z the
 for (int i = 0; i < 10; ++i) {
     std::cout << i << std::endl;
 }
-[Ctrl+D]
+[Ctrl+D]->[press Enter afterwords]
 ```
 
 ## Getting Started
