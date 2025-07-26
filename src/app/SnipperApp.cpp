@@ -6,6 +6,12 @@
 #include <memory>
 #include <set>
 #include <fstream>
+#include <algorithm>
+#include <unordered_map>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 namespace app {
 
@@ -23,28 +29,45 @@ int SnipperApp::run() {
   }
 
   const std::string& command = _args[0];
-  if (command == "list") {
+  if (command == "init") {
+    std::optional<std::string> nameOpt;
+    if (_args.size() >= 2) nameOpt = _args[1];
+    initStore(nameOpt);
+
+  } else if (command == "list") {
     if (_args.size() >= 3 && _args[1] == "--tags") {
       listSnippetsByTags(_args[2]);
     } else {
       listSnippets();
     }
+
+  } else if (command == "list-by-tags" && _args.size() >= 2) {
+    listSnippetsByTags(_args[1]);
+
   } else if (command == "add") {
     addSnippet();
+
   } else if (command == "remove" && _args.size() >= 2) {
     removeSnippet(_args[1]);
+
   } else if (command == "copy" && _args.size() >= 2) {
     copySnippet(_args[1]);
+
   } else if (command == "show" && _args.size() >= 2) {
     showSnippet(_args[1]);
+
   } else if (command == "search" && _args.size() >= 2) {
     searchSnippets(_args[1]);
+
   } else if (command == "edit" && _args.size() >= 2) {
     editSnippet(_args[1]);
+
+  } else if (command == "rename" && _args.size() >= 3) {
+    renameSnippet(_args[1], _args[2]);
+
   } else if (command == "export") {
     std::optional<std::string> idOpt;
     std::string filePath = "snippets_export.json";
-
     for (size_t i = 1; i < _args.size(); ++i) {
       if (_args[i] == "--file" && i + 1 < _args.size()) {
         filePath = _args[i + 1];
@@ -53,18 +76,31 @@ int SnipperApp::run() {
         idOpt = _args[i];
       }
     }
-
     exportSnippets(idOpt, filePath);
+
   } else if (command == "import") {
     if (_args.size() < 3) {
       std::cout << "Usage: snipper import <file_path> [--overwrite]\n";
       return 1;
     }
-
     std::string filePath = _args[2];
     bool overwrite = (_args.size() >= 4 && _args[3] == "--overwrite");
     importSnippets(filePath, overwrite);
+
+  } else if (command == "sort") {
+    sortSnippets();
+
+  } else if (command == "clear") {
+    clearSnippets();
+
+  } else if (command == "stats") {
+    showStats();
+
+  } else if (command == "help") {
+    printHelp();
+
   } else {
+    std::cout << "Unknown command: " << command << "\n";
     printHelp();
   }
 
@@ -76,27 +112,22 @@ void SnipperApp::printHelp() {
   std::cout << "Usage:\n";
   std::cout << "  snipper <command> [options]\n\n";
   std::cout << "Commands:\n";
-  std::cout << "  init [name]                Initialize a new snippet store (optionally named)\n";
-  std::cout << "  add                        Add a new snippet\n";
-  std::cout << "  edit <id>                 Edit an existing snippet\n";
-  std::cout << "  remove <id>               Remove a snippet by ID\n";
-  std::cout << "  copy <id>                 Copy snippet content to clipboard\n";
-  std::cout << "  show <id>                 Display snippet content\n";
-  std::cout << "  list                      List all snippets\n";
-  std::cout << "  list-by-tags <tags>       List snippets filtered by comma-separated tags\n";
-  std::cout << "  search <query>            Search snippets by content, title, or tags\n";
-  std::cout << "  rename <old-id> <new-id>  Rename a snippet ID\n";
-  std::cout << "  export [id] <file>        Export all or a specific snippet to a JSON file\n";
+  std::cout << "  init [name]                 Initialize a new snippet store (optionally named)\n";
+  std::cout << "  add                         Add a new snippet\n";
+  std::cout << "  edit <id>                   Edit an existing snippet\n";
+  std::cout << "  remove <id>                 Remove a snippet by ID\n";
+  std::cout << "  copy <id>                   Copy snippet content to clipboard\n";
+  std::cout << "  show <id>                   Display snippet content\n";
+  std::cout << "  list                        List all snippets\n";
+  std::cout << "  list-by-tags <tags>         List snippets filtered by comma-separated tags\n";
+  std::cout << "  search <query>              Search snippets by content, title, or tags\n";
+  std::cout << "  rename <old-id> <new-id>    Rename a snippet ID\n";
+  std::cout << "  export [id] --file <file>   Export all or a specific snippet to a JSON file\n";
   std::cout << "  import <file> [--overwrite] Import snippets from JSON file (optional overwrite)\n";
-  std::cout << "  sort                      Sort and list snippets by title\n";
-  std::cout << "  clear                     Clear all snippets (with confirmation)\n";
-  std::cout << "  stats                     Show statistics about your snippets\n";
-  std::cout << "  help                      Show this help message\n\n";
-  std::cout << "Examples:\n";
-  std::cout << "  snipper add\n";
-  std::cout << "  snipper edit 3\n";
-  std::cout << "  snipper import backup.json --overwrite\n";
-  std::cout << "  snipper list-by-tags cpp,utility\n";
+  std::cout << "  sort                        Sort and list snippets by title\n";
+  std::cout << "  clear                       Clear all snippets (with confirmation)\n";
+  std::cout << "  stats                       Show statistics about your snippets\n";
+  std::cout << "  help                        Show this help message\n\n";
 }
 
 void SnipperApp::listSnippets() {
@@ -135,11 +166,6 @@ void SnipperApp::addSnippet() {
 void SnipperApp::removeSnippet(const std::string& id) {
   _store.removeSnippet(id);
   std::cout << "Snippet removed.\n";
-}
-
-std::string normalizeId(const std::string& id) {
-  size_t pos = id.find_first_not_of('0');
-  return (pos == std::string::npos) ? "0" : id.substr(pos);
 }
 
 void SnipperApp::copySnippet(const std::string& id) {
@@ -392,6 +418,74 @@ void SnipperApp::importSnippets(const std::string& filePath, bool overwrite) {
   std::cout << "Imported: " << imported
             << " | Replaced: " << replaced
             << " | Skipped: " << skipped << "\n";
+}
+
+void SnipperApp::initStore(const std::optional<std::string>& nameOpt) {
+  // Determine path: either default or a new file named <name>.json
+  std::string dbPath = _config.snippetsDbPath();
+  if (nameOpt) {
+    dbPath = nameOpt.value() + ".json";
+    _store = core::SnippetStore(dbPath);
+  }
+  // Create an empty JSON array in the target file
+  std::ofstream out(dbPath);
+  if (!out) {
+    std::cout << "Failed to create store at: " << dbPath << "\n";
+    return;
+  }
+  out << "[]\n";
+  std::cout << "Initialized snippet store at: " << dbPath << "\n";
+}
+
+void SnipperApp::renameSnippet(const std::string& oldId, const std::string& newId) {
+  auto all = _store.loadSnippets();
+  const auto oNorm = normalizeId(oldId);
+  auto it = std::find_if(all.begin(), all.end(),
+                         [&](auto& s){ return normalizeId(s.id) == oNorm; });
+  if (it == all.end()) {
+    std::cout << "No snippet with ID " << oldId << "\n";
+    return;
+  }
+  it->id = normalizeId(newId);
+  _store.saveSnippets(all);
+  std::cout << "Renamed snippet " << oldId << " → " << it->id << "\n";
+}
+
+void SnipperApp::sortSnippets() {
+  auto all = _store.loadSnippets();
+  std::sort(all.begin(), all.end(), [](auto& a, auto& b){
+    return a.title < b.title;
+  });
+  _store.saveSnippets(all);
+  std::cout << "Snippets sorted by title.\n";
+  listSnippets();
+}
+
+void SnipperApp::clearSnippets() {
+  std::cout << "Are you sure you want to delete ALL snippets? (y/N): ";
+  std::string ans;
+  std::getline(std::cin, ans);
+  if (ans == "y" || ans == "Y") {
+    // Save empty list
+    _store.saveSnippets({});
+    std::cout << "All snippets cleared.\n";
+  } else {
+    std::cout << "Operation cancelled.\n";
+  }
+}
+
+void SnipperApp::showStats() {
+  auto all = _store.loadSnippets();
+  std::cout << "Total snippets: " << all.size() << "\n";
+  std::unordered_map<std::string,int> tagCount;
+  for (auto& s : all)
+    for (auto& t : s.tags)
+      tagCount[t]++;
+  if (!tagCount.empty()) {
+    std::cout << "Tag usage:\n";
+    for (auto& [tag,c] : tagCount)
+      std::cout << "  " << tag << ": " << c << "\n";
+  }
 }
 
 }  // namespace app
