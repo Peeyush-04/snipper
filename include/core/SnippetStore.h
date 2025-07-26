@@ -1,9 +1,10 @@
 #ifndef CORE_SNIPPETSTORE_H
 #define CORE_SNIPPETSTORE_H
 
+#include <models/Snippet.h>
 #include <string>
 #include <vector>
-#include <models/Snippet.h>
+#include <optional>
 
 namespace core {
 
@@ -11,16 +12,18 @@ class SnippetStore {
 public:
   explicit SnippetStore(const std::string& dbPath);
 
-  // Load all snippets (throws std::runtime_error on error)
   std::vector<model::Snippet> loadSnippets();
-
-  // Save back to disk
   void saveSnippets(const std::vector<model::Snippet>& snippets);
 
-  // Convenience for CRUD:
   void addSnippet(const model::Snippet& s);
   void updateSnippet(const model::Snippet& s);
   void removeSnippet(const std::string& id);
+
+  std::vector<model::Snippet> getAllSnippets();
+  std::optional<model::Snippet> getSnippetById(const std::string& id);
+  std::vector<model::Snippet> getSnippetsByTags(const std::vector<std::string>& tags);
+  void renameSnippet(const std::string& oldId, const std::string& newId);
+  void clearAll();
 
 private:
   std::string _dbPath;
