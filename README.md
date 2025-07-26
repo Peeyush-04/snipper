@@ -1,7 +1,7 @@
 # Snipper
 
 **Snipper** is a powerful, cross-platform, command-line snippet manager built in C++.
-It helps developers save, search, tag, edit, and manage reusable code snippets using a cargo-style CLI.
+It helps developers save, search, tag, edit, and manage reusable code snippets (currently using a cargo-style CLI).
 
 ## Features
 
