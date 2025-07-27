@@ -52,7 +52,7 @@ for (int i = 0; i < 10; ++i) {
 ### Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/snipper.git
+git clone https://github.com/Peeyush-04/snipper.git
 cd snipper
 ```
 
