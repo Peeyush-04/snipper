@@ -112,6 +112,8 @@ To build and run tests:
 ```bash
 cd build
 ctest --verbose
+[OR]
+ninja test (To do complete testing)
 ```
 
 Or run specific test executables inside `build/bin` directory:
