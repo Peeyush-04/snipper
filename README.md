@@ -110,7 +110,8 @@ Snipper uses [GoogleTest](https://github.com/google/googletest) for unit testing
 To build and run tests:
 
 ```bash
-mkdir -p data - (project root)
+[start from project root]
+mkdir -p data
 cd build
 ctest --verbose
 [OR]
