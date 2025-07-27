@@ -128,26 +128,26 @@ Or run specific test executables inside `build/bin` directory:
 
 ```
 snipper/
-├── include/           # Public headers
+├── include/                # Public headers
 │   ├── app/
 │   ├── core/
 │   ├── models/
 │   ├── platform/
 │   ├── search/
 │   └── external/json.hpp
-├── src/               # Implementation files
+├── src/                    # Implementation files
 │   ├── app/
 │   ├── core/
 │   ├── cli/
 │   ├── models/
 │   ├── platform/
 │   └── search/
-├── config/            # Default config JSON
-├── data/              # Snippets database
-├── tests/             # GoogleTest-based unit tests
-├── scripts/           # CLI binary is output here
-├── CMakeLists.txt     # CMake build file
-└── README.md          # You're here!
+├── config/                 # Default config JSON
+├── data/                   # Snippets database
+├── tests/                  # GoogleTest-based unit tests
+├── scripts/                # CLI binary is output here
+├── CMakeLists.txt          # CMake build file
+└── README.md               # You're here!
 ```
 
 ## Compatibility
